@@ -1,0 +1,18 @@
+--- C:/xampp1/htdocs/xampp/wordpress-svn/src/wp-content/plugins/omnisearch/wp-admin/includes/class-wp-search-media.php	Sun Mar  9 21:41:24 2014
++++ C:/xampp1/htdocs/xampp/gsoc/wp-content/plugins/omnisearch/wp-admin/includes/class-wp-search-media.php	Sat Mar  8 14:29:25 2014
+@@ -16,11 +16,13 @@ class WP_Search_Media extends WP_Media_List_Table
+ 
+ 		$this->prepare_items();
+ 		$columns = $this->get_columns();
++		$num_of_items=count($this->items);
+ 		unset( $columns['cb'] );
+ 		$this->_column_headers = array( $columns, array(), array() );
+-
++		
+ 		$html = '<h2>' . esc_html__( 'Media' ) . $this->search_link_maybe( $search_term ) . '</h2>';
+-
++		if($num_of_items)
++			$html.='<h3> Items found are '. $num_of_items.'<h3>';
+ 		ob_start();
+ 		if ( $this->items ) {
+ 			$this->display();
