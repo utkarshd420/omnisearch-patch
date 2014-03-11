@@ -1,29 +1,23 @@
 --- C:/xampp1/htdocs/xampp/wordpress-svn/src/wp-content/plugins/omnisearch/wp-admin/includes/class-wp-search-posts.php	Sun Mar  9 21:41:24 2014
-+++ C:/xampp1/htdocs/xampp/gsoc/wp-content/plugins/omnisearch/wp-admin/includes/class-wp-search-posts.php	Sat Mar  8 14:18:54 2014
-@@ -14,7 +14,7 @@ class WP_Search_Posts extends WP_Posts_List_Table
- 	function __construct( $post_type = 'post' ) {
- 		$this->post_type = $post_type;
- 		$this->is_trash  = false;
--		add_filter( 'wp_search_results', array( $this, 'search' ), 10, 2 );
-+		add_filter( 'wp_search_results', array( $this, 'search' ), 10, 2 ); 	//wp_search_results Not clear
- 	}
- 
- 	function search( $results, $search_term ) {
-@@ -39,13 +39,15 @@ class WP_Search_Posts extends WP_Posts_List_Table
++++ C:/xampp1/htdocs/xampp/gsoc/wp-content/plugins/omnisearch/wp-admin/includes/class-wp-search-posts.php	Tue Mar 11 23:38:51 2014
+@@ -39,15 +39,18 @@ class WP_Search_Posts extends WP_Posts_List_Table
  			'post_status'    => 'any',
  		);
  		$this->items = get_posts( $args );
 -
-+		$num_of_items=count($this->items);
-+		//echo("No of ". $this->post_type ." ".$num_of_items."");
++		$num_of_items = count ( $this->items );
  		$columns = $this->get_columns();
  		unset( $columns['cb'] );
  		$this->_column_headers = array( $columns, array(), array() );
  
  		$html = '<h2>' . esc_html( $this->post_type_object->labels->name ) . $this->search_link_maybe( $search_term ) .'</h2>';
 -
-+		if($num_of_items)
++		if ( $num_of_items ) {
 +			$html .= '<h3> No. of '. $this->post_type ."s found are ". $num_of_items;
++		}
  		ob_start();
  		if ( $this->items ) {
++			parent::$search_term = $search_term;
  			$this->display();
+ 		} else {
+ 			?>

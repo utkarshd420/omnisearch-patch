@@ -1,5 +1,5 @@
 --- C:/xampp1/htdocs/xampp/wordpress-svn/src/wp-content/plugins/omnisearch/wp-admin/includes/class-wp-search.php	Sun Mar  9 21:44:19 2014
-+++ C:/xampp1/htdocs/xampp/gsoc/wp-content/plugins/omnisearch/wp-admin/includes/class-wp-search.php	Sun Mar  9 21:12:41 2014
++++ C:/xampp1/htdocs/xampp/gsoc/wp-content/plugins/omnisearch/wp-admin/includes/class-wp-search.php	Tue Mar 11 23:36:07 2014
 @@ -1,5 +1,5 @@
  <?php
 -
@@ -7,96 +7,79 @@
  // Include this here so that other plugins can extend it if they like.
  require_once( dirname( __FILE__ ) . '/class-wp-search-posts.php' );
  
-@@ -6,7 +6,7 @@ require_once( dirname( __FILE__ ) . '/class-wp-sea
+@@ -6,7 +6,6 @@ require_once( dirname( __FILE__ ) . '/class-wp-sea
  class WP_Search {
  	static $instance;
  	static $num_results = 5;
 -
-+//constructor
  	function __construct() {
  		self::$instance = $this;
  		add_action( 'admin_init',                array( $this, 'add_providers' ) );
-@@ -77,8 +77,15 @@ class WP_Search {
+@@ -77,6 +76,14 @@ class WP_Search {
  							'alternate_submit'   => true,
  						) ); ?>
  			<?php if( ! empty( $results ) ): ?>
 +			<?php
-+				if(ob_get_level() && isset($_GET['style']))
++				if ( ob_get_level () && isset ( $_GET[ 'style' ] ) ){
 +					ob_end_clean();
-+				else if(ob_get_level())
++				}
++				else if ( ob_get_level() ) {
 +					ob_flush();
++				}
 +				?>
  				<h3 id="results-title"><?php esc_html_e( 'Results:' ); ?></h3>
  				<div class="jump-to"><strong><?php esc_html_e( 'Jump to:' ); ?></strong>
-+				
  					<?php foreach( $results as $label => $result ) : ?>
- 						<a href="#result-<?php echo sanitize_title( $label ); ?>"><?php echo esc_html( $label ); ?></a>
- 					<?php endforeach; ?>
-@@ -85,6 +92,7 @@ class WP_Search {
- 				</div>
- 				<br class="clear" />
- 				<script>var search_term = '<?php echo esc_js( $s ); ?>', num_results = <?php echo intval( apply_filters( 'wp_search_num_results', 5 ) ); ?>;</script>
-+
- 				<ul class="wp-search-results">
- 					<?php foreach( $results as $label => $result ) : ?>
- 						<li id="result-<?php echo sanitize_title( $label ); ?>" data-label="<?php echo esc_attr( $label ); ?>">
-@@ -93,11 +101,13 @@ class WP_Search {
- 						</li>
- 					<?php endforeach; ?>
+@@ -95,9 +102,9 @@ class WP_Search {
  				</ul>
-+
  			<?php endif; ?>
  		</div><!-- /wrap -->
 -		<?php
-+		
-+		<?php ob_start();
++		<?php 
++			ob_start();
  	}
 -
-+	
  	function admin_bar_search( $wp_admin_bar ) {
  		if( ! is_admin() || ! current_user_can( 'edit_posts' ) || wp_is_mobile() )
  			return;
-@@ -118,6 +128,11 @@ class WP_Search {
+@@ -118,6 +125,12 @@ class WP_Search {
  				'tabindex' => -1,
  			)
  		) );
-+		if(ob_get_level() && isset($_GET['style']))
++		if ( ob_get_level () && isset( $_GET['style'] ) ) {
 +			ob_end_clean();
-+		else if(ob_get_level())
++		}
++		else if ( ob_get_level()) {
 +			ob_flush();
-+		
++		}
  	}
  
  	static function get_wp_search_form( $args = array() ) {
-@@ -139,13 +154,37 @@ class WP_Search {
+@@ -139,13 +152,32 @@ class WP_Search {
  			$form_id = "wp_search_form_$rand";
  		if( empty( $search_id ) )
  			$search_id = "wp_search_search_$rand";
 -
-+		
  		ob_start();
  		?>
 -
 +		<script>
-+		function async_suggest(as)
++		function async_suggest ( as )
 +		{
-+			var xmlhttp=new XMLHttpRequest();
-+			xmlhttp.onreadystatechange=function()
++			var xmlhttp = new XMLHttpRequest();
++			xmlhttp.onreadystatechange = function()
 +			{
-+			if (xmlhttp.status==200)
-+			{
-+				document.getElementById("wpbody").innerHTML=xmlhttp.responseText;
++			if ( xmlhttp.status == 200) {
++				document.getElementById( "wpbody" ).innerHTML=xmlhttp.responseText;
 +				as.focus();
 +			}
 +			}
-+			if(as.value!="")
-+			{
-+				xmlhttp.open("GET","<?php echo esc_url( admin_url( 'admin.php' ) ); ?>"+"?page=search&s="+as.value+"&style=none",true);
++			if ( as.value != "" ) {
++				xmlhttp.open( "GET","<?php echo esc_url( admin_url( 'admin.php' ) ); ?>"+"?page=search&s="+as.value+"&style=none",true );
 +				xmlhttp.send();
 +			}
-+			else
-+			{
-+				xmlhttp.open("GET","<?php echo esc_url( __FILE__); ?>"+"?style=none",true);
++			else {
++				xmlhttp.open( "GET","<?php echo esc_url( __FILE__); ?>"+"?style=none",true );
 +				xmlhttp.send();
 +			}
 +		}
@@ -104,8 +87,7 @@
  		<form action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" method="get" class="<?php echo $form_class; ?>" id="<?php echo $form_id; ?>">
  			<input type="hidden" name="page" value="search" />
 -			<input name="s" type="search" class="<?php echo $search_class; ?>" id="<?php echo $search_id; ?>" value="<?php echo $search_value; ?>" placeholder="<?php echo $search_placeholder; ?>" />
-+			<input name="s" type="search" class="<?php echo $search_class; ?>" id="<?php echo $search_id; ?>" value="<?php echo $search_value; ?>" placeholder="<?php echo $search_placeholder; ?>" onkeyup="async_suggest(this)" />
-+			<div id="suggestions"></div>
++			<input name="s" type="search" class="<?php echo $search_class; ?>" id="<?php echo $search_id; ?>" value="<?php echo $search_value; ?>" placeholder="<?php echo $search_placeholder; ?>" onkeyup= "async_suggest( this )" />
  			<?php if ( $alternate_submit ) : ?>
  				<button type="submit" class="<?php echo $submit_class; ?>"><span><?php echo $submit_value; ?></span></button>
  			<?php else : ?>
