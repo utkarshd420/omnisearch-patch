@@ -9,6 +9,7 @@ Functionalities introduced in this plugin include:
 
 1. Asynchronous post, media, comments search. Also uses partial words for asynchronous testing.
 2. The count of items that have been searched, if there are any.
+3. Shows a part of post and page which has the first occurence of the term searched for. With the searched term shown in highlight.
 
 To be Done:
 The patches haven't been tested extensively. Test for bugs that they might create etc.
